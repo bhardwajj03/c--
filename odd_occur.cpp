@@ -33,7 +33,7 @@
                 else{
                     e=mid;
                 }
-            }
+            }   
             mid=s+(e-s)/2;
         }
         return -1;

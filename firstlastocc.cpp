@@ -1,48 +1,84 @@
-#include<iostream>
-using namespace std;
-int first(int arr[],int n,int k){
-    int s=0 , e=n-1;
-    int mid=s+(e-s)/2;
-    int ans;
-    while(s<=e){
-        if(arr[mid]==k){
-            ans=mid;
-            e=mid-1;
-        }
-        else if(k>arr[mid]){
-            s=mid+1;
-        }
-        else if(k<arr[mid]){
-            e=mid-1;
-        }
-        mid=s+(e-s)/2;
-    }
-    return ans;
-}
-int last(int arr[],int n,int k){
-    int s=0 , e=n-1;
-    int mid=s+(e-s)/2;
-    int ans;
-    while(s<=e){
-        if(arr[mid]==k){
-            ans=mid;
-            s=mid+1;
+#include <iostream>
+#include <stack>
 
+struct Node {
+    int val;
+    Node* next;
+    Node* prev;
+    Node* child;
+
+    Node(int _val) : val(_val), next(nullptr), prev(nullptr), child(nullptr) {}
+};
+
+Node* flatten(Node* head) {
+    if (!head) return nullptr;
+
+    Node* curr = head;
+    std::stack<Node*> stack;
+
+    while (curr) {
+        if (curr->child) {
+           
+            if (curr->next) {
+                stack.push(curr->next);
+                curr->next->prev = nullptr;  
+            }
+
+          
+            curr->next = curr->child;
+            curr->child->prev = curr;
+            curr->child = nullptr;
         }
-        else if(arr[mid]<k){
-            s=mid+1;
+
+        
+        if (!curr->next && !stack.empty()) {
+        
+            curr->next = stack.top();
+            stack.top()->prev = curr;
+            stack.pop();
         }
-        else if(arr[mid]>k){
-            e=mid-1;
-        }
-    mid =s+(e-s)/2;
+        
+        curr = curr->next;
     }
-    return ans;
+
+    return head;
 }
-int main(){
-    int a[5]={1,2,3,3,3};
-   
-    cout<<"first occurence of 3 is at index "<<first(a,5,3)<<endl;
-    cout<<"last occurence of 3 is at index "<<last(a,5,3)<<endl;;
+
+
+void printList(Node* head) {
+    while (head) {
+        std::cout << head->val << " ";
+        head = head->next;
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+  
+    Node* head = new Node(1);
+    head->next = new Node(2);
+    head->next->prev = head;
+    head->next->next = new Node(3);
+    head->next->next->prev = head->next;
+    
+    head->next->child = new Node(7);
+    head->next->child->next = new Node(8);
+    head->next->child->next->prev = head->next->child;
+    head->next->child->next->child = new Node(11);
+    head->next->child->next->child->next = new Node(12);
+    
+    head->next->next->next = new Node(4);
+    head->next->next->next->prev = head->next->next;
+    head->next->next->next->next = new Node(5);
+    head->next->next->next->next->prev = head->next->next->next;
+    
+    std::cout << "Original multilevel list:\n";
+    printList(head); 
+    
+    Node* flattenedHead = flatten(head);
+    std::cout << "\nFlattened list:\n";
+    printList(flattenedHead);
+
+    
     return 0;
 }
